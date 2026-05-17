@@ -12,7 +12,7 @@ public class TNM_TileEntityCentrifuge extends TileEntity implements IInventory {
 	public boolean IsnextoToReactor;
 	public boolean IsnextoTocable;
 	public int inferiorheatTimer = 0;
-	public int decay = 20;
+	public int decay = 200;
 
 	public int poweredCounter = 0;
 
@@ -160,9 +160,10 @@ public class TNM_TileEntityCentrifuge extends TileEntity implements IInventory {
 			--decay;
 			if (decay <= 0) {
 				burntime -= 20;
+				decay = 40;
 				if (burntime <= 0) {
 					burntime = 0;
-					decay = 0; // reset only when empty
+					decay = 200; // reset only when empty
 				}
 			}
 		}

@@ -7,8 +7,8 @@ public class TNM_GuiWarhead extends GuiContainer {
 
     public TNM_GuiWarhead(InventoryPlayer playerInv, TNM_TileEntityWarhead warhead) {
         super(new TNM_ContainerNuke(playerInv, warhead));
-        this.xSize = 176; // standard width
-        this.ySize = 166; // standard height
+        this.xSize = 176; 
+        this.ySize = 166; 
         this.Warhead = warhead;
     }
 
@@ -25,7 +25,7 @@ public class TNM_GuiWarhead extends GuiContainer {
         int x = (width - xSize) / 2;
         int y = (height - ySize) / 2;
     
-        // Draw the base GUI background
+
         GL11.glColor4f(1F, 1F, 1F, 1F);
         drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
     

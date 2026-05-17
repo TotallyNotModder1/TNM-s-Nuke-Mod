@@ -215,7 +215,7 @@ public class TNM_TileEntityRGenerator extends TileEntity implements IInventory {
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {
 		if (stack == null) return false;
 
-		if (slot < 13 && stack.itemID == mod_NukeModMain.FlaskNuclearWaste.shiftedIndex);
+		if (slot < 13 && stack.itemID == mod_NukeModMain.FlaskNuclearWaste.shiftedIndex) return true;
 		if (slot == 13) return true;
 		if (slot == 14) return false;
 		if (slot == 15) return false;

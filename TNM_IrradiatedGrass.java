@@ -18,13 +18,12 @@ public class TNM_IrradiatedGrass extends Block {
 
 	@Override
 	public boolean isBlockSolidOnSide(World world, int x, int y, int z, int side) {
-		// Still solid for placement, but not valid for mob spawning
 		return false;
 	}
 	
 	@Override
 	public boolean isOpaqueCube() {
-		return true; // stays solid
+		return true;
 	}
 
 	@Override

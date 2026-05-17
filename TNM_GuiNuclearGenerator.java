@@ -8,8 +8,8 @@ public class TNM_GuiNuclearGenerator extends GuiContainer {
 
     public TNM_GuiNuclearGenerator(InventoryPlayer playerInv, TNM_TileEntityRGenerator generator) {
         super(new TNM_ContainerReactor(playerInv, generator));
-        this.xSize = 189; // standard width
-        this.ySize = 179; // standard height
+        this.xSize = 189; 
+        this.ySize = 179; 
         this.Generator = generator;
     }
 
@@ -30,7 +30,6 @@ public class TNM_GuiNuclearGenerator extends GuiContainer {
     
     @Override
     protected void drawGuiContainerForegroundLayer() {
-        // Use the formatter
         String burnText = formatEnergy(Generator.EnergyOutputPerTick);
     
         fontRenderer.drawString("TeF/t:", 7, ySize - 165 + 2, 0x111f09);
@@ -48,7 +47,6 @@ public class TNM_GuiNuclearGenerator extends GuiContainer {
         int x = (width - xSize) / 2;
         int y = (height - ySize) / 2;
     
-        // Draw the base GUI background
         GL11.glColor4f(1F, 1F, 1F, 1F);
         drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
 
@@ -62,7 +60,6 @@ public class TNM_GuiNuclearGenerator extends GuiContainer {
             int progress = (Generator.Enrichmentprogress * 22) / 1000;
             if (progress > 22) progress = 22; // clamp
     
-            // draw bar at GUI coords (80,35), using texture slice at (177,14)
             drawTexturedModalRect(x + 7, y + 85, 0, 179, progress, 6);
         }
     }
