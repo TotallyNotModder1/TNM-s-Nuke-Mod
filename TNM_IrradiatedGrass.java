@@ -14,22 +14,30 @@ public class TNM_IrradiatedGrass extends Block {
 		this.top = index2;
 		this.bottom = index3;
 	}
-	
 
 	@Override
 	public boolean isBlockSolidOnSide(World world, int x, int y, int z, int side) {
-		return false;
+		// Only the top face is solid, so torches can sit on it
+		return side == 1;
 	}
 	
 	@Override
 	public boolean isOpaqueCube() {
-		return true;
+		// Return false so mobs don't treat it as a valid spawn surface
+		return false;
 	}
+	
 
 	@Override
 	public boolean renderAsNormalBlock() {
-		return true;
+		return false;
 	}
+
+	@Override
+	public int getRenderType() {
+		return 0; // normal cube renderer
+	}
+
 
 	public int idDropped(int var1, Random var2) {
 		return Block.dirt.blockID;

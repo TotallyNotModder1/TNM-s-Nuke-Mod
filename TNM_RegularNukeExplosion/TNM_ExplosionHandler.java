@@ -67,17 +67,17 @@ public class TNM_ExplosionHandler extends Entity{
             }
             if (tickCounter == 20){
                 worldObj.entityJoinedWorld(basecloud1);
-                mod_NukeModMain.triggerNukeBlastStep2(worldObj, (int)Math.floor(this.posX), (int)Math.floor(this.posY), (int)Math.floor(this.posZ), 60);
+                mod_NukeModMain.triggerNukeBlastStep2(worldObj, (int)Math.floor(this.posX), (int)Math.floor(this.posY), (int)Math.floor(this.posZ), 60, 0.5);
                 worldObj.entityJoinedWorld(Burnwave);
             }
             if (tickCounter == 30){
                 worldObj.entityJoinedWorld(MushroomHead);
-                mod_NukeModMain.triggerNukeBlastStep2(worldObj, (int)Math.floor(this.posX), (int)Math.floor(this.posY) + 2, (int)Math.floor(this.posZ), 80);
+                mod_NukeModMain.triggerNukeBlastStep2(worldObj, (int)Math.floor(this.posX), (int)Math.floor(this.posY) + 2, (int)Math.floor(this.posZ), 80, 0.5);
             }
             if (tickCounter == 31){
                 worldObj.entityJoinedWorld(basecloud2);
-                mod_NukeModMain.triggerNukeBlastStep2(worldObj, (int)Math.floor(this.posX), (int)Math.floor(this.posY) + 4, (int)Math.floor(this.posZ), 85);
-                mod_NukeModMain.triggerNukeCrater(worldObj, (int)Math.floor(this.posX), (int)Math.floor(this.posY), (int)Math.floor(this.posZ), 20, 35);
+                mod_NukeModMain.triggerNukeBlastStep2(worldObj, (int)Math.floor(this.posX), (int)Math.floor(this.posY) + 4, (int)Math.floor(this.posZ), 85, 0.5);
+                mod_NukeModMain.triggerNukeCrater(worldObj, (int)Math.floor(this.posX), (int)Math.floor(this.posY), (int)Math.floor(this.posZ), 20, 35, 0.3);
                 worldObj.playSoundEffect(posX, posY, posZ, "ambient.weather.thunder", 2000.0F, 0.05F + rand.nextFloat() * 0.2F);
                 worldObj.playSoundEffect(this.posX, this.posY, this.posZ, "random.explode", 2000.0F, 0.05F + rand.nextFloat() * 0.2F);
             }

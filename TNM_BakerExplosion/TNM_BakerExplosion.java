@@ -46,11 +46,11 @@ public class TNM_BakerExplosion extends Entity{
                 0F,
                 false
             );
-            mod_NukeModMain.triggerNukeBlastStep2(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 50);
+            mod_NukeModMain.triggerNukeBlastStep2(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 50, 0.5);
             TNM_NuclearExplosionDamage.NuclearDamage(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 35, 35, 0);
         }  
         if (ticksExisted == 10){
-            mod_NukeModMain.triggerNukeCrater(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 20, 25);
+            mod_NukeModMain.triggerNukeCrater(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 20, 25, 0.3);
             worldObj.entityJoinedWorld(Burnwave);
             worldObj.entityJoinedWorld(Shockwave);
             worldObj.entityJoinedWorld(Wilson);

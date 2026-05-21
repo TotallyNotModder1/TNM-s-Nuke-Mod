@@ -5,6 +5,7 @@ import java.util.Map;
 
 import TNM_AudioManager.TNM_SoundHelper;
 import forge.MinecraftForge;
+import forge.ForgeHooksClient;
 import forge.Property;
 import TNM_BakerExplosion.TNM_BakerExplosion;
 import TNM_BakerExplosion.TNM_BakerMushroomCloud;
@@ -14,13 +15,17 @@ import TNM_MiniNuke.TNM_MiniNukeMushroomCloud;
 import TNM_MiniNuke.TNM_MininukeEntity;
 import TNM_MiniNuke.TNM_WheatNukePrimed;
 import TNM_PlasmaExplosion.TNM_PlasmaExplosion;
+import TNM_RecipeBookClasses.TNM_FalloutBookItem;
+import TNM_RecipeBookClasses.TNM_RecipeBookItem;
 import TNM_RegularNukeExplosion.TNM_BaseCloudHandler;
 import TNM_RegularNukeExplosion.TNM_BurnWaveHandler;
+import TNM_RegularNukeExplosion.TNM_EntityCustomFX;
 import TNM_RegularNukeExplosion.TNM_ExplosionHandler;
 import TNM_RegularNukeExplosion.TNM_MHeadHandler;
 import TNM_RegularNukeExplosion.TNM_MHeadHandlerOShell;
 import TNM_RegularNukeExplosion.TNM_ShockwaveHandler;
 import TNM_RegularNukeExplosion.TNM_StemHandler;
+import TNM_Weather.TNM_FalloutWeather;
 import forge.Configuration;
 import net.minecraft.client.Minecraft;
 
@@ -57,9 +62,9 @@ public class mod_NukeModMain extends BaseMod {
     public static int CentrifugeTop = ModLoader.addOverride("/terrain.png", "NukeTex/centrifugetopbott.png");
     public static int miniReactorTex = ModLoader.addOverride("/terrain.png", "NukeTex/Reactortex.png");
     public static int pipetex = ModLoader.addOverride("/terrain.png", "NukeTex/HeatPipeTex.png");
-    public static int piebombside = ModLoader.addOverride("/terrain.png", "NukeTex/piebomb side.png");
-    public static int piebombtop = ModLoader.addOverride("/terrain.png", "NukeTex/piebomb top.png");
-    public static int piebombbottom = ModLoader.addOverride("/terrain.png", "NukeTex/piebomb bottom.png");
+    public static int piebombside = ModLoader.addOverride("/terrain.png", "NukeTex/piebombside.png");
+    public static int piebombtop = ModLoader.addOverride("/terrain.png", "NukeTex/piebombtop.png");
+    public static int piebombbottom = ModLoader.addOverride("/terrain.png", "NukeTex/piebombbottom.png");
     public static int AssemblySideTex = ModLoader.addOverride("/terrain.png", "NukeTex/AssemblyUnitSide.png");
     public static int antennatip = ModLoader.addOverride("/terrain.png", "NukeTex/Antennatop.png");
     public static int antennaside = ModLoader.addOverride("/terrain.png", "NukeTex/Antenna.png");
@@ -114,6 +119,7 @@ public class mod_NukeModMain extends BaseMod {
     public static int repairkittex = ModLoader.addOverride("/gui/items.png", "NukeTex/hrepairkit.png");
     public static int filtertex = ModLoader.addOverride("/gui/items.png", "NukeTex/filter.png");
     public static int heatpipeitemtex = ModLoader.addOverride("/gui/items.png", "NukeTex/heatpipe.png");
+    public static int recipebooktex = ModLoader.addOverride("/gui/items.png", "NukeTex/recipebook.png");
 
     //---------------------------------------------------------------------------------block declarations---------------------------------------------------------------------------------//
     public static Block BlockNuke = new TNM_NukeBlock(getBlockIdFor("NukeTest", 115)
@@ -177,10 +183,12 @@ public class mod_NukeModMain extends BaseMod {
     public static Block SlagBlock = new TNM_Trinitite(getBlockIdFor("Slag", 134), slagtex, false, false, false, 0)
     .setHardness(1F).setStepSound(Block.soundGravelFootstep).setBlockName("Slag");
 
-    public static Block NuclearWaste = new TNM_NuclearWaste(getBlockIdFor("NuclearWaste", 135), wastetex).setHardness(0.1F).setBlockName("Nuclear Waste");
+    public static Block NuclearWaste = new TNM_NuclearWaste(getBlockIdFor("NuclearWaste", 135), wastetex, false).setHardness(0.1F).setBlockName("Nuclear Waste");
 
     public static Block WheatNuke = new TNM_WheatNuke(getBlockIdFor("WTDOUNuclearBomb", 136)
     , Material.leaves, wheatside, wheattop, wheatbottom).setBlockName("WTDOTU Nuclear Bomb");
+
+    public static Block Fallout = new TNM_NuclearWaste(getBlockIdFor("Fallout", 137), 0, true).setStepSound(Block.soundSandFootstep).setHardness(0.1F).setBlockName("Fallout");
 
     //---------------------------------------------------------------------------------Item declarations---------------------------------------------------------------------------------//
     public static Item Bazooka = new TNM_Bazooka(getItemIdFor("FamiliarWeapon",109)
@@ -260,6 +268,12 @@ public class mod_NukeModMain extends BaseMod {
     public static Item HeatPipeItem = (new ItemReed(getItemIdFor("HeatPipeItem",141)
     , heatPipe)).setIconIndex(heatpipeitemtex).setItemName("Heat Pipe");
 
+    public static Item RecipeBook = new TNM_RecipeBookItem(getItemIdFor("RecipeBook",142)).setIconIndex(recipebooktex).setItemName("Recipe Book");
+
+    //test item
+    public static Item FalloutDebug = new TNM_FalloutBookItem(getItemIdFor("FalloutSpawner",150)).setIconIndex(NukeTex).setItemName("FalloutSpawner");
+
+
     //---------------------------------------------------------------------------------armor declarations---------------------------------------------------------------------------------//
 
     public static final Item HazmatHelmet = new TNM_HazmatArmor(getItemIdFor("HazmatSuitHelmet",133)
@@ -331,6 +345,7 @@ public class mod_NukeModMain extends BaseMod {
         ModLoader.RegisterBlock(SlagBlock);
         ModLoader.RegisterBlock(NuclearWaste);
         ModLoader.RegisterBlock(WheatNuke);
+        ModLoader.RegisterBlock(Fallout);
 
 
         //Name registry
@@ -356,7 +371,7 @@ public class mod_NukeModMain extends BaseMod {
         ModLoader.AddName(SlagBlock, "Slag");
         ModLoader.AddName(NuclearWaste, "Nuclear Waste");
         ModLoader.AddName(WheatNuke, "WTDOTU Nuclear Bomb");
-
+        ModLoader.AddName(Fallout, "Fallout");
 
         //Item Name registry
         ModLoader.AddName(Bazooka, "Familiar Weapon");
@@ -387,6 +402,7 @@ public class mod_NukeModMain extends BaseMod {
         ModLoader.AddName(Filter, "Mask Filter");
         ModLoader.AddName(detonator, "detonator");
         ModLoader.AddName(HeatPipeItem, "Heat Pipe");
+        ModLoader.AddName(RecipeBook, "Nuclear Recipe Book");
         
 
         //Armor Name Registry
@@ -412,6 +428,8 @@ public class mod_NukeModMain extends BaseMod {
         ModLoader.RegisterEntityID(TNM_BakerExplosion.class, "Baker", ModLoader.getUniqueEntityId());
         ModLoader.RegisterEntityID(TNM_BakerMushroomCloud.class, "BakerMushroom", ModLoader.getUniqueEntityId());
         ModLoader.RegisterEntityID(TNM_WheatNukePrimed.class, "WheatNukePrimed", ModLoader.getUniqueEntityId());
+        //ModLoader.RegisterEntityID(TNM_EntityCustomFX.class, "EntityCustomFX", ModLoader.getUniqueEntityId());
+        ModLoader.RegisterEntityID(TNM_FalloutWeather.class, "FalloutWeather", ModLoader.getUniqueEntityId()); //WORK IN PROGRESS
 
 
         //TileEntity registry
@@ -489,9 +507,12 @@ public class mod_NukeModMain extends BaseMod {
 
         //shapeless crafting
         ModLoader.AddShapelessRecipe(new ItemStack(mod_NukeModMain.RedCake), new Object[]{Item.redstone, Item.bucketWater, Item.gunpowder});
-
+        ModLoader.AddShapelessRecipe(new ItemStack(RecipeBook, 1), new Object[] {Item.book, Item.redstone, new ItemStack(Item.dyePowder, 1, 6)});
 
         //assembly
+        /*
+        // disabled for the time being
+
         TNM_AssemblyRecipes.getInstance().addRecipe(
             new ItemStack(BlockFamNuke),
             new ItemStack(SideShowBP), // blueprint item
@@ -504,9 +525,46 @@ public class mod_NukeModMain extends BaseMod {
             '#', HeavyRod,
             'G', Block.tnt
         );
+
+        TNM_AssemblyRecipes.getInstance().addRecipe(
+            new ItemStack(HeatPipeItem),
+            null,
+            false,
+            new String[]{
+                "R.R",
+                "R.R",
+                "R.R",
+                "R.R"
+            },
+            'R', Item.ingotIron
+        );
+        */
+        TNM_AssemblyRecipes.getInstance().addRecipe(
+            new ItemStack(CentrifugeBlock),
+            null,
+            false,
+            new String[]{
+                "RGR",
+                "RIR",
+                "RRR"
+            },
+            'R', Item.ingotIron,
+            'I', Item.redstone,
+            'G', Block.glass
+        );
+        TNM_AssemblyRecipes.getInstance().addRecipe(
+            new ItemStack(NPropellant),
+            null, // blueprint item
+            false, // requires blueprint
+            new String[] {
+                "#G#",
+                "#G#",
+            },
+            'G', Item.gunpowder
+        );
         TNM_AssemblyRecipes.getInstance().addRecipe(
             new ItemStack(NukeBullet),
-            new ItemStack(SideShowBP), // blueprint item
+            null, // blueprint item
             false, // requires blueprint
             new String[] {
                 "#G#",
@@ -524,6 +582,17 @@ public class mod_NukeModMain extends BaseMod {
                 "RER"
             }, 'E', EnrichedRedstone,
             'R', Berylliumplate
+        );
+        TNM_AssemblyRecipes.getInstance().addRecipe(
+            new ItemStack(Berylliumplate),
+            null, // blueprint item
+            false, // requires blueprint
+            new String[] {
+                "G#",
+                "G#"
+            },
+            'G', Block.obsidian,
+            '#', BerylliumIngot
         );
         TNM_AssemblyRecipes.getInstance().addRecipe(
             new ItemStack(Nukebarrel),
@@ -560,27 +629,6 @@ public class mod_NukeModMain extends BaseMod {
             'A', Warhead1
         );
         TNM_AssemblyRecipes.getInstance().addRecipe(
-            new ItemStack(NPropellant),
-            new ItemStack(SideShowBP), // blueprint item
-            false, // requires blueprint
-            new String[] {
-                "#G#",
-                "#G#",
-            },
-            'G', Item.gunpowder
-        );
-        TNM_AssemblyRecipes.getInstance().addRecipe(
-            new ItemStack(Berylliumplate),
-            new ItemStack(SideShowBP), // blueprint item
-            false, // requires blueprint
-            new String[] {
-                "G#",
-                "G#",
-            },
-            'G', Block.obsidian,
-            '#', BerylliumIngot
-        );
-        TNM_AssemblyRecipes.getInstance().addRecipe(
             new ItemStack(Antenna),
             null,
             false,
@@ -605,6 +653,18 @@ public class mod_NukeModMain extends BaseMod {
             'I', Item.ingotIron
         );
         TNM_AssemblyRecipes.getInstance().addRecipe(
+            new ItemStack(HazmatHelmet),
+            null,
+            false,
+            new String[]{
+                "III",
+                "I.I",
+                "IRI"
+            },
+            'I', latex,
+            'R', Item.ingotIron
+        );
+        TNM_AssemblyRecipes.getInstance().addRecipe(
             new ItemStack(HazmatChest),
             null,
             false,
@@ -616,7 +676,7 @@ public class mod_NukeModMain extends BaseMod {
             'I', latex
         );
         TNM_AssemblyRecipes.getInstance().addRecipe(
-            new ItemStack(HazmatChest),
+            new ItemStack(HazmatLegs),
             null,
             false,
             new String[]{
@@ -627,7 +687,7 @@ public class mod_NukeModMain extends BaseMod {
             'I', latex
         );
         TNM_AssemblyRecipes.getInstance().addRecipe(
-            new ItemStack(HazmatChest),
+            new ItemStack(HazmatBoots),
             null,
             false,
             new String[]{
@@ -636,18 +696,6 @@ public class mod_NukeModMain extends BaseMod {
                 "I.I"
             },
             'I', latex
-        );
-        TNM_AssemblyRecipes.getInstance().addRecipe(
-            new ItemStack(HazmatHelmet),
-            null,
-            false,
-            new String[]{
-                "III",
-                "I.I",
-                "IRI"
-            },
-            'I', latex,
-            'R', Item.ingotIron
         );
         TNM_AssemblyRecipes.getInstance().addRecipe(
             new ItemStack(RepairKit),
@@ -673,31 +721,7 @@ public class mod_NukeModMain extends BaseMod {
             'P', Item.paper, 'C', Item.coal,
             'R', Item.ingotIron
         );
-        TNM_AssemblyRecipes.getInstance().addRecipe(
-            new ItemStack(HeatPipeItem),
-            null,
-            false,
-            new String[]{
-                "R.R",
-                "R.R",
-                "R.R",
-                "R.R"
-            },
-            'R', Item.ingotIron
-        );
-        TNM_AssemblyRecipes.getInstance().addRecipe(
-            new ItemStack(CentrifugeBlock),
-            null,
-            false,
-            new String[]{
-                "RGR",
-                "RIR",
-                "RRR"
-            },
-            'R', Item.ingotIron,
-            'I', Item.redstone,
-            'G', Block.glass
-        );
+
 
 
         //crafting
@@ -737,6 +761,27 @@ public class mod_NukeModMain extends BaseMod {
         config.save();
     }
 
+    public boolean OnTickInGame(Minecraft mc, int pass) {
+        if (pass == 1) { // transparent pass
+            if (mc.theWorld == null) return false;
+
+            float partialTicks = mc.renderViewEntity != null ? mc.renderViewEntity.ticksExisted + mc.renderViewEntity.getEyeHeight() : 0F;
+
+            for (Object o : mc.theWorld.loadedEntityList) {
+                if (o instanceof TNM_EntityCustomFX) {
+                    TNM_EntityCustomFX fx = (TNM_EntityCustomFX)o;
+
+                    double x = fx.prevPosX + (fx.posX - fx.prevPosX) * partialTicks - RenderManager.renderPosX;
+                    double y = fx.prevPosY + (fx.posY - fx.prevPosY) * partialTicks - RenderManager.renderPosY;
+                    double z = fx.prevPosZ + (fx.posZ - fx.prevPosZ) * partialTicks - RenderManager.renderPosZ;
+
+                    new TNM_RenderCustomParticle().doRender(fx, x, y, z, 0.0F, partialTicks);
+                }
+            }
+        }
+        return true;
+	}
+
 
     //register custom block renderers
     public boolean RenderWorldBlock(RenderBlocks renderer, IBlockAccess world, int x, int y, int z, Block block, int modelId){
@@ -764,6 +809,7 @@ public class mod_NukeModMain extends BaseMod {
             new TNM_BurnLoosen(world, x, y, z);
         }
     }
+    
 
     public static void triggerNukeCrater(World world, int x, int y, int z, int depth, int radius, double fuzziness) {
         new TNM_NuclearExplosionCrater(world, x, y, z, depth, radius, fuzziness);
@@ -794,7 +840,6 @@ public class mod_NukeModMain extends BaseMod {
             mc.effectRenderer.addEffect(fx);
         }
 
-
     }
 
     public static void spawnStemparticle(World world, String name, double x, double y, double z, double motX, double motY, double motZ, float scale, int maxAge, int freezeAt, boolean useDrag, float R, float G, float B){
@@ -808,6 +853,7 @@ public class mod_NukeModMain extends BaseMod {
         }
         mc.effectRenderer.addEffect(fx);
     }
+    
 
     public static void newexplosionNuke(World world, Entity exploder,
         double x, double y, double z, float size, boolean flaming, int flameblock, boolean damage) {
@@ -834,6 +880,9 @@ public class mod_NukeModMain extends BaseMod {
         map.put(TNM_BakerMushroomCloud.class, new TNM_RenderInvisible());
         map.put(TNM_BakerExplosion.class, new TNM_RenderInvisible());
         map.put(TNM_WheatNukePrimed.class, new TNM_RenderWheatNuke());
+        //map.put(TNM_EntityCustomFX.class, new TNM_RenderCustomParticle()); //WIP may remove...
+        map.put(TNM_FalloutWeather.class, new TNM_RenderInvisible());
+
     }
 
     public static int getBlockIdFor(String key, int defaultID) {

@@ -46,8 +46,8 @@ public class TNM_MiniNukeHandler extends Entity{
                 0F,
                 false
             );
-            mod_NukeModMain.triggerNukeCrater(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 5, 10);
-            mod_NukeModMain.triggerNukeBlastStep2(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 30);
+            mod_NukeModMain.triggerNukeCrater(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 5, 10, 0.3);
+            mod_NukeModMain.triggerNukeBlastStep2(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 30, 0.5);
         }  
         if (ticksExisted == 10){
             worldObj.entityJoinedWorld(Burnwave);

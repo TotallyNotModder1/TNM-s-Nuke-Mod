@@ -74,6 +74,7 @@ public class TNM_Antenna extends Block {
             int wy = y + o[1];
             int wz = z + o[2];
             int id = world.getBlockId(wx, wy, wz);
+            int idONuke = world.getBlockId(x, y - 1, z);
             int meta = world.getBlockMetadata(wx, wy, wz);
     
             if (id == mod_NukeModMain.Warhead1.blockID) {
@@ -82,6 +83,13 @@ public class TNM_Antenna extends Block {
                     ((TNM_NuclearWarhead)warhead).ignite(world, wx, wy, wz);
                     world.setBlock(x, y, z, 0); // remove antenna after use
                 }
+            }
+
+            if (idONuke == mod_NukeModMain.BlockNuke.blockID) {
+                TNM_NukePrimed entitynuke = new TNM_NukePrimed(world, (double)((float)x + 0.5F), (double)((float)y + 0.5F), (double)((float)z + 0.5F));
+                world.entityJoinedWorld(entitynuke);
+                world.setBlock(x, y, z, 0); // remove antenna after use
+                world.setBlock(x, y - 1, z, 0);
             }
         }
     }

@@ -3,14 +3,14 @@ package net.minecraft.src;
 import java.util.*;
 
 public class TNM_CentrifugeRecipes {
-    private static final TNM_CentrifugeRecipes centrifugeBase = new TNM_CentrifugeRecipes();
-    private Map<Integer, CentrifugeRecipe> recipeList = new HashMap<Integer, CentrifugeRecipe>();
+    public static final TNM_CentrifugeRecipes centrifugeBase = new TNM_CentrifugeRecipes();
+    public Map<Integer, CentrifugeRecipe> recipeList = new HashMap<Integer, CentrifugeRecipe>();
 
     public static TNM_CentrifugeRecipes centrifuge() {
         return centrifugeBase;
     }
 
-    private TNM_CentrifugeRecipes() {}
+    public TNM_CentrifugeRecipes() {}
 
     // Register recipe with guaranteed + weighted pools for slot 5 and slot 6
     public void addCentrifuge(int inputID,
@@ -51,7 +51,7 @@ public class TNM_CentrifugeRecipes {
             return rollWeighted(poolSlot6, rand);
         }
 
-        private ItemStack rollWeighted(WeightedOutput[] pool, Random rand) {
+        public ItemStack rollWeighted(WeightedOutput[] pool, Random rand) {
             if (pool == null || pool.length == 0) return null;
 
             int totalWeight = 0;

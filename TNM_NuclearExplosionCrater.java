@@ -6,16 +6,16 @@ public class TNM_NuclearExplosionCrater {
     private int setDepth;
     private int setRadius;
 
-    public TNM_NuclearExplosionCrater(World world, int x, int y, int z, int Depth, int Radius){
+    public TNM_NuclearExplosionCrater(World world, int x, int y, int z, int Depth, int Radius, double Fuzziness){
         this.setDepth = Depth;
         this.setRadius = Radius;
-        this.createCrater(world, x, y, z);
+        this.createCrater(world, x, y, z, Fuzziness);
     }
 
-    public void createCrater(World world, int x, int y, int z) {
+    public void createCrater(World world, int x, int y, int z, double fuzz) {
         int radius = setRadius; //35; // half of 70
         int maxDepth = setDepth; //20; // shallower than before
-        double fuzziness = 0.3;
+        double fuzziness = fuzz; //0.3;
 
         world.playSoundEffect(x, y, z, "random.explode", 4.0F, 0.5F);
 

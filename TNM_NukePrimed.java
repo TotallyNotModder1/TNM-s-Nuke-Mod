@@ -40,8 +40,11 @@ public class TNM_NukePrimed extends Entity {
 	}
 
 	private void explode() {
-		TNM_ExplosionHandler mininuke = new TNM_ExplosionHandler(worldObj, this.posX, this.posY, this.posZ);
-		worldObj.entityJoinedWorld(mininuke);
+		mod_NukeModMain.triggerNukeBlastStep2(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 60, 0);
+		TNM_NuclearExplosionDamage.NuclearDamage(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 100, 25, 200);
+		mod_NukeModMain.triggerNukeCrater(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 20, 35, 0);
+		worldObj.playSoundEffect(posX, posY, posZ, "ambient.weather.thunder", 2000.0F, 0.05F + rand.nextFloat() * 0.2F);
+		worldObj.playSoundEffect(this.posX, this.posY, this.posZ, "random.explode", 2000.0F, 0.05F + rand.nextFloat() * 0.2F);
         if (this.worldObj == null) return;
 	}
 
@@ -61,7 +64,7 @@ public class TNM_NukePrimed extends Entity {
 			this.motionY *= -0.5D;
 		}
 
-		if(this.nukefuse-- <= 0 || this.onGround) {
+		if(this.nukefuse-- <= 0) {
 			if(!this.worldObj.multiplayerWorld) {
 				this.explode();
 				this.setEntityDead();

@@ -6,12 +6,15 @@ import java.util.Random;
 import TNM_AudioManager.TNM_SoundHelper;
 
 public class TNM_NuclearWaste extends Block {
-	protected TNM_NuclearWaste(int id, int index) {
+	private boolean Fallout;
+
+	protected TNM_NuclearWaste(int id, int index, boolean fallout) {
 		super(id, index, Material.snow);
 		this.blockIndexInTexture = index;
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 2.0F / 16.0F, 1.0F);
 		this.setTickOnLoad(true);
 		this.setStepSound(soundPowderFootstep);
+		this.Fallout = fallout;
 	}
 
 
@@ -55,6 +58,14 @@ public class TNM_NuclearWaste extends Block {
 
 	@Override
 	public void randomDisplayTick(World world, int x, int y, int z, Random rand) {
+
+		float color1 = 0.62F;
+		float color2 = 0.72F;
+
+		if (Fallout){
+			color1 = 0.35F;
+			color2 = 0.35F;
+		}
 	
 		// Particle effect
 		double px = (double)x + rand.nextFloat();
@@ -67,7 +78,7 @@ public class TNM_NuclearWaste extends Block {
 			px, py + 0.1, pz,
 			0.0D, vy, 0.0D,
 			0,
-			0.62F, 0.72F, 0.62F,
+			color1, color2, color1,
 			1F,
 			2F,
 			false,
@@ -90,51 +101,92 @@ public class TNM_NuclearWaste extends Block {
 			)
 		);
 
-		for (Entity e : entities) {
-			if (e instanceof EntityPlayer) {
-				EntityPlayer player = (EntityPlayer)e;
-				ItemStack[] armor = player.inventory.armorInventory;
+		if (!Fallout){
 
-				boolean fullHazmat =
-				armor[3] != null && armor[3].getItem() == mod_NukeModMain.HazmatHelmet &&
-				armor[2] != null && armor[2].getItem() == mod_NukeModMain.HazmatChest &&
-				armor[1] != null && armor[1].getItem() == mod_NukeModMain.HazmatLegs &&
-				armor[0] != null && armor[0].getItem() == mod_NukeModMain.HazmatBoots;
+			for (Entity e : entities) {
+				if (e instanceof EntityPlayer) {
+					EntityPlayer player = (EntityPlayer)e;
+					ItemStack[] armor = player.inventory.armorInventory;
 	
-
-				ItemStack helmet = player.inventory.armorInventory[3]; // helmet slot
-
-				if (fullHazmat && helmet != null && helmet.getItem() == mod_NukeModMain.HazmatHelmet) {
-					int max = helmet.getMaxDamage();
-				
-					if (helmet.getItemDamage() < max - 1) {
-						helmet.damageItem(5, player);
+					boolean fullHazmat =
+					armor[3] != null && armor[3].getItem() == mod_NukeModMain.HazmatHelmet &&
+					armor[2] != null && armor[2].getItem() == mod_NukeModMain.HazmatChest &&
+					armor[1] != null && armor[1].getItem() == mod_NukeModMain.HazmatLegs &&
+					armor[0] != null && armor[0].getItem() == mod_NukeModMain.HazmatBoots;
+		
+	
+					ItemStack helmet = player.inventory.armorInventory[3]; // helmet slot
+	
+					if (fullHazmat && helmet != null && helmet.getItem() == mod_NukeModMain.HazmatHelmet) {
+						int max = helmet.getMaxDamage();
+					
+						if (helmet.getItemDamage() < max - 5) {
+							helmet.damageItem(5, player);
+						} else {
+							helmet.setItemDamage(max - 5); // clamp durability at 1
+							player.attackEntityFrom(null, 5); // radiation leaks through
+						}
 					} else {
-						helmet.setItemDamage(max - 1); // clamp durability at 1
-						player.attackEntityFrom(null, 5); // radiation leaks through
+						// No helmet or not full hazmat → radiation hits directly
+						player.attackEntityFrom(null, 5);
 					}
-				} else {
-					// No helmet or not full hazmat → radiation hits directly
-					player.attackEntityFrom(null, 5);
+					
+				} else if (e instanceof EntityCreature){
+					e.attackEntityFrom(null, 5);
 				}
-				
-			} else if (e instanceof EntityCreature){
-				e.attackEntityFrom(null, 5);
 			}
-		}
+	
+			for (Entity e : entities) {
+				if (e instanceof EntityPlayer) {
+					EntityPlayer p = (EntityPlayer)e;
+	
+					// Only play if moving
+					if (Math.abs(p.motionX) > 0.01 || Math.abs(p.motionZ) > 0.01) {
+						// Use player.ticksExisted as a simple cadence
+						if (p.ticksExisted % 4 == 0) { // every 6 ticks ≈ 3 steps per second
+							TNM_SoundHelper.playEntitySound(p,
+								rand.nextBoolean() ? "mud1.wav" : "mud2.wav",
+								0.4F
+							);
+						}
+					}
+				}
+			}
+		} else {
+			for (Entity e : entities) {
+				if (e instanceof EntityPlayer) {
+					EntityPlayer player = (EntityPlayer)e;
+					ItemStack[] armor = player.inventory.armorInventory;
+	
+					boolean fullHazmat =
+					armor[3] != null && armor[3].getItem() == mod_NukeModMain.HazmatHelmet &&
+					armor[2] != null && armor[2].getItem() == mod_NukeModMain.HazmatChest &&
+					armor[1] != null && armor[1].getItem() == mod_NukeModMain.HazmatLegs &&
+					armor[0] != null && armor[0].getItem() == mod_NukeModMain.HazmatBoots;
+		
+	
+					ItemStack helmet = player.inventory.armorInventory[3]; // helmet slot
+					int roll = rand.nextInt(10);
+					
 
-		for (Entity e : entities) {
-			if (e instanceof EntityPlayer) {
-				EntityPlayer p = (EntityPlayer)e;
-
-				// Only play if moving
-				if (Math.abs(p.motionX) > 0.01 || Math.abs(p.motionZ) > 0.01) {
-					// Use player.ticksExisted as a simple cadence
-					if (p.ticksExisted % 4 == 0) { // every 6 ticks ≈ 3 steps per second
-						TNM_SoundHelper.playEntitySound(p,
-							rand.nextBoolean() ? "mud1.wav" : "mud2.wav",
-							0.4F
-						);
+					if (fullHazmat && helmet != null && helmet.getItem() == mod_NukeModMain.HazmatHelmet) {
+						int max = helmet.getMaxDamage();
+					
+						if (helmet.getItemDamage() < max - 5) {
+							if (roll == 1){
+								helmet.damageItem(1, player);
+							}
+						} else {
+							helmet.setItemDamage(max - 5); // clamp durability at 1
+							player.attackEntityFrom(null, 1); // radiation leaks through
+						}
+					} else {
+						if (roll == 1){
+							if (roll == 1){
+								player.attackEntityFrom(null, 5);
+								TNM_SoundHelper.playEntitySound(player, "geiger3.wav", 0.6F);
+							}
+						}
 					}
 				}
 			}

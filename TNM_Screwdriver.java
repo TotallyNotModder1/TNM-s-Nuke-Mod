@@ -1,10 +1,5 @@
 package net.minecraft.src;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import net.minecraft.client.Minecraft;
-
 public class TNM_Screwdriver extends Item { 
 
     public TNM_Screwdriver(int id){

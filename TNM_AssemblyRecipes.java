@@ -3,22 +3,22 @@ package net.minecraft.src;
 import java.util.*;
 
 public class TNM_AssemblyRecipes {
-    private static final TNM_AssemblyRecipes instance = new TNM_AssemblyRecipes();
-    private List<RecipeEntry> recipes = new ArrayList<RecipeEntry>();
+    public static final TNM_AssemblyRecipes instance = new TNM_AssemblyRecipes();
+    public List<RecipeEntry> recipes = new ArrayList<RecipeEntry>();
 
     public static TNM_AssemblyRecipes getInstance() {
         return instance;
     }
 
-    private TNM_AssemblyRecipes() {}
+    public TNM_AssemblyRecipes() {}
 
     // Inner recipe entry
-    private static class RecipeEntry {
-        ItemStack output;
-        String[] shape; // 5 rows × 3 cols
-        Map<Character, ItemStack> mapping;
-        ItemStack blueprint;        // may be null
-        boolean requiresBlueprint;  // true if blueprint is mandatory
+    public static class RecipeEntry {
+        public ItemStack output;
+        public String[] shape; // 5 rows × 3 cols
+        public Map<Character, ItemStack> mapping;
+        public ItemStack blueprint;        // may be null
+        public boolean requiresBlueprint;  // true if blueprint is mandatory
 
         RecipeEntry(ItemStack output, String[] shape, Map<Character, ItemStack> mapping,
                     ItemStack blueprint, boolean requiresBlueprint) {
@@ -29,7 +29,7 @@ public class TNM_AssemblyRecipes {
             this.requiresBlueprint = requiresBlueprint;
         }
 
-        boolean matches(ItemStack[] grid, ItemStack blueprintSlot) {
+        public boolean matches(ItemStack[] grid, ItemStack blueprintSlot) {
             if (requiresBlueprint) {
                 if (blueprintSlot == null || blueprint == null) return false;
                 if (blueprintSlot.itemID != blueprint.itemID) return false;
@@ -91,4 +91,9 @@ public class TNM_AssemblyRecipes {
         }
         return null;
     }
+
+    public List<RecipeEntry> getRecipeList() {
+        return recipes;
+    }
+    
 }

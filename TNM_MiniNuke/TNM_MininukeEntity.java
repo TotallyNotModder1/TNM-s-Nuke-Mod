@@ -1,7 +1,6 @@
 package TNM_MiniNuke;
 
-import TNM_BakerExplosion.TNM_BakerExplosion;
-import TNM_RegularNukeExplosion.TNM_ExplosionHandler;
+import TNM_RegularNukeExplosion.TNM_EntityCustomFX;
 import net.minecraft.src.Entity;
 import net.minecraft.src.MathHelper;
 import net.minecraft.src.NBTTagCompound;
@@ -43,7 +42,9 @@ public class TNM_MininukeEntity extends Entity {
 
 	private void explode() {
 		TNM_MiniNukeHandler mininuke = new TNM_MiniNukeHandler(worldObj, this.posX, this.posY, this.posZ);
+		//TNM_EntityCustomFX effect = new TNM_EntityCustomFX(worldObj, posX, posY, posZ, 0, 0.2D, 0, 100F, 400, 0, "/NukeTex/flash.png");
 		worldObj.entityJoinedWorld(mininuke);
+		//worldObj.entityJoinedWorld(effect);
         if (this.worldObj == null) return;
 	}
 
@@ -57,11 +58,7 @@ public class TNM_MininukeEntity extends Entity {
 		this.motionX *= (double)0.98F;
 		this.motionY *= (double)0.98F;
 		this.motionZ *= (double)0.98F;
-		if(this.onGround) {
-			this.motionX *= (double)0.7F;
-			this.motionZ *= (double)0.7F;
-			this.motionY *= -0.5D;
-		}
+
 		if (this.ticksinair > 50000){
 			this.setEntityDead();
 		}

@@ -4,12 +4,12 @@ import java.util.List;
 
 public class TNM_NuclearExplosionBlastStep2 {
 
-    public TNM_NuclearExplosionBlastStep2(World world, int x, int y, int z, int blastRadius){
-        this.createCrater(world, x, y, z, blastRadius);
+    public TNM_NuclearExplosionBlastStep2(World world, int x, int y, int z, int blastRadius, double fuzziness){
+        this.createCrater(world, x, y, z, blastRadius, fuzziness);
     }
 
-    public void createCrater(World world, int x, int y, int z, int blastradius) {
-        double fuzziness = 0.5;
+    public void createCrater(World world, int x, int y, int z, int blastradius, double fuzz) {
+        double fuzziness = fuzz;//0.5;
         // --- Blast dome above ---
         int blastRadius = blastradius;
         for (int dx = -blastRadius; dx <= blastRadius; dx++) {
