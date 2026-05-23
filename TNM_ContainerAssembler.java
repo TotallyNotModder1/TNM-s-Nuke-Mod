@@ -41,6 +41,55 @@ public class TNM_ContainerAssembler extends Container {
         }
     }
 
+    public ItemStack getStackInSlot(int index) {
+        ItemStack result = null;
+        Slot slot = (Slot) this.slots.get(index);
+    
+        if (slot != null && slot.getHasStack()) {
+            ItemStack stack = slot.getStack();
+            result = stack.copy();
+    
+            // --- Allow shift-click OUT of crafting grid (0–14) and result slot (15) ---
+            if (index >= 0 && index <= 15) {
+                // Move into player inventory (slots 19–45)
+                this.func_28125_a(stack, 19, 45, true);
+            }
+
+            else if (index >= 16 && index <= 18){
+                this.func_28125_a(stack, 19, 45, true);
+            }
+
+            // --- Player inventory slots (19–46) ---
+            else{
+                // Main inventory (19–46) → hotbar (46–55)
+                if (index >= 19 && index < 46) {
+                    this.func_28125_a(stack, 46, 55, false);
+                }
+                // Hotbar (46–55) → main inventory (19–46)
+                else {
+                    this.func_28125_a(stack, 19, 46, false);
+                }
+            }
+            // --- Blueprint (16), Flask input (17), Flask output (18) ---
+            // No shift-click allowed INTO these slots → do nothing
+    
+            if (stack.stackSize == 0) {
+                slot.putStack((ItemStack) null);
+            } else {
+                slot.onSlotChanged();
+            }
+    
+            if (stack.stackSize == result.stackSize) {
+                return null;
+            }
+    
+            slot.onPickupFromSlot(stack);
+        }
+    
+        return result;
+    }
+    
+
     @Override
     public boolean isUsableByPlayer(EntityPlayer player) {
         return tile.canInteractWith(player);

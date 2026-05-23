@@ -26,7 +26,7 @@ public class TNM_ContainerCentrifuge extends Container {
         }
     }
 
-    public ItemStack GetStackInSlot(EntityPlayer player, int index) {
+    public ItemStack getStackInSlot(int index) {
         ItemStack result = null;
         Slot slot = (Slot) this.slots.get(index);
 

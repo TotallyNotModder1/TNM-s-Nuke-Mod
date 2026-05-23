@@ -42,9 +42,7 @@ public class TNM_MininukeEntity extends Entity {
 
 	private void explode() {
 		TNM_MiniNukeHandler mininuke = new TNM_MiniNukeHandler(worldObj, this.posX, this.posY, this.posZ);
-		//TNM_EntityCustomFX effect = new TNM_EntityCustomFX(worldObj, posX, posY, posZ, 0, 0.2D, 0, 100F, 400, 0, "/NukeTex/flash.png");
 		worldObj.entityJoinedWorld(mininuke);
-		//worldObj.entityJoinedWorld(effect);
         if (this.worldObj == null) return;
 	}
 

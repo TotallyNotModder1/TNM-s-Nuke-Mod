@@ -1,6 +1,7 @@
 package net.minecraft.src;
 
 import TNM_MiniNuke.TNM_MiniNukeHandler;
+import TNM_RegularNukeExplosion.TNM_EntityCustomFX;
 import TNM_RegularNukeExplosion.TNM_ExplosionHandler;
 
 public class TNM_NukePrimed extends Entity {
@@ -43,6 +44,9 @@ public class TNM_NukePrimed extends Entity {
 		mod_NukeModMain.triggerNukeBlastStep2(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 60, 0);
 		TNM_NuclearExplosionDamage.NuclearDamage(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 100, 25, 200);
 		mod_NukeModMain.triggerNukeCrater(worldObj, (int)this.posX, (int)this.posY, (int)this.posZ, 20, 35, 0);
+		TNM_EntityCustomFX effect = new TNM_EntityCustomFX(worldObj, posX, posY, posZ,
+        0, 0.2D, 0, 30, 0, 100, 100, 1000);
+		worldObj.entityJoinedWorld(effect);
 		worldObj.playSoundEffect(posX, posY, posZ, "ambient.weather.thunder", 2000.0F, 0.05F + rand.nextFloat() * 0.2F);
 		worldObj.playSoundEffect(this.posX, this.posY, this.posZ, "random.explode", 2000.0F, 0.05F + rand.nextFloat() * 0.2F);
         if (this.worldObj == null) return;

@@ -42,7 +42,7 @@ public class TNM_MHeadHandlerOShell extends Entity{
 
 
         if (ticksExisted >= 1000 * Math.sqrt(sizemultiplier)){
-            samplesC = (int)(15 * Math.sqrt(sizemultiplier));
+            samplesC = (int)(4 * Math.sqrt(sizemultiplier));
             RC = 21.5 * Math.sqrt(sizemultiplier);
             rC = 16.5 * Math.sqrt(sizemultiplier);
             skirtscale = (float) (200F + worldObj.rand.nextInt(5)  * Math.sqrt(sizemultiplier)); 
@@ -54,7 +54,7 @@ public class TNM_MHeadHandlerOShell extends Entity{
         }
 
         if (ticksExisted >= 1500 * Math.sqrt(sizemultiplier)){
-            samplesC = (int)(7 * Math.sqrt(sizemultiplier));
+            samplesC = (int)(8 * Math.sqrt(sizemultiplier));
             RC = 28 * Math.sqrt(sizemultiplier);
             rC = 23 * Math.sqrt(sizemultiplier);
             color1 = 0.95F;

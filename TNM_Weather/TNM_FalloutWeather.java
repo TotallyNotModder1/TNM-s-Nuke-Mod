@@ -46,13 +46,13 @@ public class TNM_FalloutWeather extends Entity{
         super.onUpdate();
         ++ticktrack;
     
-        // activate only after explosionhandler is dead
-        if (ticktrack >= 1) {
+        // activate only after set ticks
+        if (ticktrack >= 300) {
             // Every 30 ticks (1.5 seconds), try to place fallout
             if (ticktrack % 10 == 0) {
                 for (int i = 0; i < 50; i++) { // try 10 random spots per cycle
-                    int dx = (int)(posX + (rand.nextInt(601) - 300)); // -200..+200
-                    int dz = (int)(posZ + (rand.nextInt(601) - 300));
+                    int dx = (int)(posX + (rand.nextInt(401) - 200)); // -200..+200
+                    int dz = (int)(posZ + (rand.nextInt(401) - 200));
                     int y = worldObj.getHeightValue(dx, dz); // highest block at column
         
                     // Check if exposed to sky

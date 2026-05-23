@@ -4,10 +4,19 @@ import java.util.Random;
 
 
 public class TNM_NukeBlock extends Block{
+    private int Tip;
+    private int Side;
 
-    public TNM_NukeBlock(int id, Material material, int index){
+    public TNM_NukeBlock(int id, Material material, int index, int index2){
         super(id, material);
         this.blockIndexInTexture = index;
+        this.Side = index;
+        this.Tip = index2;
+    }
+
+    public int getBlockTextureFromSide(int side){
+        if (side <= 1) return Tip;
+        else return Side;
     }
 
     public  void onBlockAdded(World world, int x, int y, int z){

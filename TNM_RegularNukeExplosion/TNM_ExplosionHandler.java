@@ -33,6 +33,11 @@ public class TNM_ExplosionHandler extends Entity{
         TNM_BurnWaveHandler Burnwave = new TNM_BurnWaveHandler(worldObj, this.posX, this.posY, this.posZ, 62);
         TNM_WilsonCloudHandler Wilson = new TNM_WilsonCloudHandler(worldObj, this.posX, this.posY, this.posZ, 55, false, false);
         TNM_WilsonCloudHandler Wilson2 = new TNM_WilsonCloudHandler(worldObj, this.posX, this.posY + 70, this.posZ, 65, false, true);
+        TNM_EntityCustomFX effect = new TNM_EntityCustomFX(worldObj, posX, posY, posZ,
+        0, 0.2D, 0, 30, 0, 100, 100, 1000);
+
+        TNM_EntityCustomFX effect2 = new TNM_EntityCustomFX(worldObj, posX, posY + 1, posZ,
+        0, 0.2D, 0, 400, 0, 200, 5, 100);
 
         ++tickCounter;
     
@@ -40,30 +45,8 @@ public class TNM_ExplosionHandler extends Entity{
 
             if (tickCounter == 2) {
                 mod_NukeModMain.triggerNukeBlastStep1(worldObj, (int)Math.floor(this.posX), (int)Math.floor(this.posY), (int)Math.floor(this.posZ));
-                mod_NukeModMain.spawnTNMParticle(
-                    worldObj, "Flash",
-                    this.posX,
-                    this.posY,
-                    this.posZ,
-                    0.0D,
-                    0.0D,
-                    0.0D,
-                    1F,
-                    1F,
-                    1F,
-                    1F,
-                    1F,
-                    1,
-                    true,
-                    20,
-                    true,
-                    false,
-                    0,
-                    0,
-                    0,
-                    5000F,
-                    true
-                );
+                worldObj.entityJoinedWorld(effect);
+                worldObj.entityJoinedWorld(effect2);
             }
             if (tickCounter == 20){
                 worldObj.entityJoinedWorld(basecloud1);

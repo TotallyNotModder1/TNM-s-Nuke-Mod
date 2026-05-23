@@ -42,7 +42,8 @@ public class mod_NukeModMain extends BaseMod {
     }
 
     //block textures
-    public static int NukeTex = ModLoader.addOverride("/terrain.png", "NukeTex/testnuke.png");
+    public static int NukeTexSide = ModLoader.addOverride("/terrain.png", "NukeTex/TNukeSide.png");
+    public static int NukeTexTip = ModLoader.addOverride("/terrain.png", "NukeTex/TNukeTip.png");
     public static int FamNuke0 = ModLoader.addOverride("/terrain.png", "NukeTex/FamNukeBottom.png");
     public static int FamNuke1 = ModLoader.addOverride("/terrain.png", "NukeTex/FamNukeTop.png");
     public static int FamNukeSide = ModLoader.addOverride("/terrain.png", "NukeTex/FamNukeSide.png");
@@ -123,7 +124,7 @@ public class mod_NukeModMain extends BaseMod {
 
     //---------------------------------------------------------------------------------block declarations---------------------------------------------------------------------------------//
     public static Block BlockNuke = new TNM_NukeBlock(getBlockIdFor("NukeTest", 115)
-    , Material.leaves, NukeTex).setBlockName("NukeTest");
+    , Material.leaves, NukeTexSide, NukeTexTip).setBlockName("NukeTest");
 
     public static Block BlockFamNuke = new TNM_FamNuke(getBlockIdFor("NuclearExplosive",116)
     , Material.leaves, FamNukeSide, FamNuke1, FamNuke0).setStepSound(Block.soundGrassFootstep).setBlockName("Nuclear Explosive");
@@ -271,7 +272,7 @@ public class mod_NukeModMain extends BaseMod {
     public static Item RecipeBook = new TNM_RecipeBookItem(getItemIdFor("RecipeBook",142)).setIconIndex(recipebooktex).setItemName("Recipe Book");
 
     //test item
-    public static Item FalloutDebug = new TNM_FalloutBookItem(getItemIdFor("FalloutSpawner",150)).setIconIndex(NukeTex).setItemName("FalloutSpawner");
+    public static Item FalloutDebug = new TNM_FalloutBookItem(getItemIdFor("FalloutSpawner",150)).setIconIndex(10).setItemName("FalloutSpawner");
 
 
     //---------------------------------------------------------------------------------armor declarations---------------------------------------------------------------------------------//
@@ -428,9 +429,8 @@ public class mod_NukeModMain extends BaseMod {
         ModLoader.RegisterEntityID(TNM_BakerExplosion.class, "Baker", ModLoader.getUniqueEntityId());
         ModLoader.RegisterEntityID(TNM_BakerMushroomCloud.class, "BakerMushroom", ModLoader.getUniqueEntityId());
         ModLoader.RegisterEntityID(TNM_WheatNukePrimed.class, "WheatNukePrimed", ModLoader.getUniqueEntityId());
-        //ModLoader.RegisterEntityID(TNM_EntityCustomFX.class, "EntityCustomFX", ModLoader.getUniqueEntityId());
         ModLoader.RegisterEntityID(TNM_FalloutWeather.class, "FalloutWeather", ModLoader.getUniqueEntityId()); //WORK IN PROGRESS
-
+        ModLoader.RegisterEntityID(TNM_EntityCustomFX.class, "EntityCustomFX", ModLoader.getUniqueEntityId());
 
         //TileEntity registry
         ModLoader.RegisterTileEntity(TNM_TileEntityWarhead.class, "TileEntityWarhead");
@@ -557,8 +557,8 @@ public class mod_NukeModMain extends BaseMod {
             null, // blueprint item
             false, // requires blueprint
             new String[] {
-                "#G#",
-                "#G#",
+                "G.",
+                "G.",
             },
             'G', Item.gunpowder
         );
@@ -567,8 +567,8 @@ public class mod_NukeModMain extends BaseMod {
             null, // blueprint item
             false, // requires blueprint
             new String[] {
-                "#G#",
-                "#G#",
+                "G.",
+                "G.",
             },
             'G', mod_NukeModMain.EnrichedRedstone
         );
@@ -644,9 +644,9 @@ public class mod_NukeModMain extends BaseMod {
             null,
             false,
             new String[]{
-                ".B.",
-                "TI.",
-                ".I."
+                ".B",
+                "TI",
+                ".I"
             },
             'B', Block.button,
             'T', Block.torchRedstoneActive,
@@ -691,7 +691,6 @@ public class mod_NukeModMain extends BaseMod {
             null,
             false,
             new String[]{
-                "...",
                 "I.I",
                 "I.I"
             },
@@ -760,27 +759,6 @@ public class mod_NukeModMain extends BaseMod {
         
         config.save();
     }
-
-    public boolean OnTickInGame(Minecraft mc, int pass) {
-        if (pass == 1) { // transparent pass
-            if (mc.theWorld == null) return false;
-
-            float partialTicks = mc.renderViewEntity != null ? mc.renderViewEntity.ticksExisted + mc.renderViewEntity.getEyeHeight() : 0F;
-
-            for (Object o : mc.theWorld.loadedEntityList) {
-                if (o instanceof TNM_EntityCustomFX) {
-                    TNM_EntityCustomFX fx = (TNM_EntityCustomFX)o;
-
-                    double x = fx.prevPosX + (fx.posX - fx.prevPosX) * partialTicks - RenderManager.renderPosX;
-                    double y = fx.prevPosY + (fx.posY - fx.prevPosY) * partialTicks - RenderManager.renderPosY;
-                    double z = fx.prevPosZ + (fx.posZ - fx.prevPosZ) * partialTicks - RenderManager.renderPosZ;
-
-                    new TNM_RenderCustomParticle().doRender(fx, x, y, z, 0.0F, partialTicks);
-                }
-            }
-        }
-        return true;
-	}
 
 
     //register custom block renderers
@@ -880,9 +858,8 @@ public class mod_NukeModMain extends BaseMod {
         map.put(TNM_BakerMushroomCloud.class, new TNM_RenderInvisible());
         map.put(TNM_BakerExplosion.class, new TNM_RenderInvisible());
         map.put(TNM_WheatNukePrimed.class, new TNM_RenderWheatNuke());
-        //map.put(TNM_EntityCustomFX.class, new TNM_RenderCustomParticle()); //WIP may remove...
         map.put(TNM_FalloutWeather.class, new TNM_RenderInvisible());
-
+        map.put(TNM_EntityCustomFX.class, new TNM_RenderCustomParticle());
     }
 
     public static int getBlockIdFor(String key, int defaultID) {

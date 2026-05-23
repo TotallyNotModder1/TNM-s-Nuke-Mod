@@ -54,7 +54,7 @@ public class TNM_MHeadHandler extends Entity{
             vy *= speed;
             vz *= speed;
         
-            mod_NukeModMain.spawnTNMParticle(worldObj, "Smoke",
+            mod_NukeModMain.spawnTNMParticle(worldObj, "Flash",
                 px, py, pz,
                 vx, vy, vz, 0.0F,
                 1F,

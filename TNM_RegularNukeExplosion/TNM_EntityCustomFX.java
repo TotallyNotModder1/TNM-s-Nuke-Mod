@@ -5,14 +5,16 @@ import net.minecraft.src.Entity;
 import net.minecraft.src.World;
 
 
-public class TNM_EntityCustomFX extends Entity {
+public class TNM_EntityCustomFX extends Entity{
     public int particleAge = 0;
     public int particleMaxAge;
     public float particleScale;
     public float particleGravity;
-    public final String texturePath;
+    public int beamcount;
+    public float beamheight;
+    public float beamwidth;
 
-    public TNM_EntityCustomFX(World world, double x, double y, double z, double motionX, double motionY, double motionZ, float scale, int maxAge, float gravity, String texturePath) {
+    public TNM_EntityCustomFX(World world, double x, double y, double z, double motionX, double motionY, double motionZ, int maxAge, float grav, int beams, float bWidth, float bHeight) {
         super(world);
         this.setSize(0.2F, 0.2F);
         this.yOffset = this.height / 2.0F;
@@ -23,10 +25,12 @@ public class TNM_EntityCustomFX extends Entity {
         this.motionY = motionY;
         this.motionZ = motionZ;
 
-        this.particleScale = scale;
+        this.particleScale = 1F;
         this.particleMaxAge = maxAge;
-        this.particleGravity = gravity;
-        this.texturePath = texturePath;
+        this.particleGravity = grav;
+        this.beamcount = beams;
+        this.beamheight = bHeight;
+        this.beamwidth = bWidth;
     }
 
     @Override
@@ -50,7 +54,8 @@ public class TNM_EntityCustomFX extends Entity {
             this.motionX *= 0.7F;
             this.motionZ *= 0.7F;
         }
-    }   
+    }
+    
 
     @Override
     public float getEntityBrightness(float partialTick) {
