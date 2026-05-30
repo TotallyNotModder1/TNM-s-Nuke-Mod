@@ -7,6 +7,7 @@ import TNM_RegularNukeExplosion.TNM_MHeadHandlerOShell;
 import TNM_RegularNukeExplosion.TNM_ShockwaveHandler;
 import TNM_RegularNukeExplosion.TNM_StemHandler;
 import TNM_RegularNukeExplosion.TNM_WilsonCloudHandler;
+import TNM_Weather.TNM_FalloutWeather;
 import net.minecraft.src.Entity;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.World;
@@ -31,13 +32,15 @@ public class TNM_ExplosionHandler extends Entity{
         TNM_MHeadHandlerOShell MushroomHeadShell = new TNM_MHeadHandlerOShell(worldObj, this.posX, this.posY, this.posZ, 1, true);
         TNM_StemHandler Stem = new TNM_StemHandler(worldObj, this.posX, py, this.posZ, 1, false);
         TNM_BurnWaveHandler Burnwave = new TNM_BurnWaveHandler(worldObj, this.posX, this.posY, this.posZ, 62);
-        TNM_WilsonCloudHandler Wilson = new TNM_WilsonCloudHandler(worldObj, this.posX, this.posY, this.posZ, 55, false, false);
-        TNM_WilsonCloudHandler Wilson2 = new TNM_WilsonCloudHandler(worldObj, this.posX, this.posY + 70, this.posZ, 65, false, true);
+        TNM_WilsonCloudHandler Wilson = new TNM_WilsonCloudHandler(worldObj, this.posX, this.posY + 10, this.posZ, 75, false, false);
+        TNM_WilsonCloudHandler Wilson2 = new TNM_WilsonCloudHandler(worldObj, this.posX, this.posY + 100, this.posZ, 75, false, true);
+        TNM_WilsonCloudHandler Wilson3 = new TNM_WilsonCloudHandler(worldObj, this.posX, this.posY + 90, this.posZ, 95, false, true);
         TNM_EntityCustomFX effect = new TNM_EntityCustomFX(worldObj, posX, posY, posZ,
         0, 0.2D, 0, 30, 0, 100, 100, 1000);
-
         TNM_EntityCustomFX effect2 = new TNM_EntityCustomFX(worldObj, posX, posY + 1, posZ,
-        0, 0.2D, 0, 400, 0, 200, 5, 100);
+        0, 0.2D, 0, 250, 0, 100, 5, 100);
+
+        TNM_FalloutWeather fallout = new TNM_FalloutWeather(worldObj, this.posX, this.posY, this.posZ);
 
         ++tickCounter;
     
@@ -68,13 +71,25 @@ public class TNM_ExplosionHandler extends Entity{
                 worldObj.entityJoinedWorld(Shockwave);
                 worldObj.entityJoinedWorld(MushroomHeadShell);      
             }
-            if (tickCounter == 50){
-                worldObj.entityJoinedWorld(Wilson);    
+            if (tickCounter == 50){  
                 worldObj.entityJoinedWorld(Stem);   
             }
+            if (tickCounter == 58){
+                worldObj.entityJoinedWorld(Wilson);  
+            }
             if (tickCounter == 200){
+                worldObj.entityJoinedWorld(Wilson3);
+            }
+            if (tickCounter == 220){
                 worldObj.entityJoinedWorld(Wilson2);
             }
+
+
+            if (tickCounter == 300){
+                worldObj.entityJoinedWorld(fallout); // work in progress
+            }
+
+
             // Kill the controller when done
             if (tickCounter > 600) {
                 this.setEntityDead();

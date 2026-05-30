@@ -1,7 +1,12 @@
 package net.minecraft.src;
 
 import java.io.File;
+import java.nio.FloatBuffer;
 import java.util.Map;
+import java.util.Random;
+
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 
 import TNM_AudioManager.TNM_SoundHelper;
 import forge.MinecraftForge;
@@ -15,7 +20,7 @@ import TNM_MiniNuke.TNM_MiniNukeMushroomCloud;
 import TNM_MiniNuke.TNM_MininukeEntity;
 import TNM_MiniNuke.TNM_WheatNukePrimed;
 import TNM_PlasmaExplosion.TNM_PlasmaExplosion;
-import TNM_RecipeBookClasses.TNM_FalloutBookItem;
+import TNM_RecipeBookClasses.TNM_Dosimeter;
 import TNM_RecipeBookClasses.TNM_RecipeBookItem;
 import TNM_RegularNukeExplosion.TNM_BaseCloudHandler;
 import TNM_RegularNukeExplosion.TNM_BurnWaveHandler;
@@ -26,11 +31,15 @@ import TNM_RegularNukeExplosion.TNM_MHeadHandlerOShell;
 import TNM_RegularNukeExplosion.TNM_ShockwaveHandler;
 import TNM_RegularNukeExplosion.TNM_StemHandler;
 import TNM_Weather.TNM_FalloutWeather;
+import TNM_Weather.TNM_RadiationManager;
 import forge.Configuration;
 import net.minecraft.client.Minecraft;
 
 public class mod_NukeModMain extends BaseMod {
     public static Configuration config;
+    public boolean hasRadiationLoaded;
+    public TNM_RadiationManager radiationManager;
+    public World lastWorld = null;
 
     static {
         File configFile = new File(Minecraft.getMinecraftDir(), "/config/NukeMod.cfg");
@@ -121,6 +130,8 @@ public class mod_NukeModMain extends BaseMod {
     public static int filtertex = ModLoader.addOverride("/gui/items.png", "NukeTex/filter.png");
     public static int heatpipeitemtex = ModLoader.addOverride("/gui/items.png", "NukeTex/heatpipe.png");
     public static int recipebooktex = ModLoader.addOverride("/gui/items.png", "NukeTex/recipebook.png");
+    public static int geigertex = ModLoader.addOverride("/gui/items.png", "NukeTex/geigercounter.png");
+    public static int dosimetertex = ModLoader.addOverride("/gui/items.png", "NukeTex/dosimetertex.png");
 
     //---------------------------------------------------------------------------------block declarations---------------------------------------------------------------------------------//
     public static Block BlockNuke = new TNM_NukeBlock(getBlockIdFor("NukeTest", 115)
@@ -133,10 +144,10 @@ public class mod_NukeModMain extends BaseMod {
     , Material.leaves, AssemblySideTex, AssemblyTex, AssemblyTex).setHardness(0.4F).setBlockName("Assembly Module");
 
     public static Block ShattOb = new TNM_Trinitite(getBlockIdFor("ShatteredObsidian",118)
-    , ShatteredOb, false, true,false, 0).setStepSound(Block.soundGlassFootstep).setHardness(0.5F).setBlockName("Shattered Obsidian");
+    , ShatteredOb, false, true,false, 0, Material.ground).setStepSound(Block.soundGlassFootstep).setHardness(0.5F).setBlockName("Shattered Obsidian");
 
     public static Block Trinitite = new TNM_Trinitite(getBlockIdFor("Trinitite",119)
-    , TriniteTex, true, true, false, 0).setHardness(0.2F).setBlockName("Trinitite");
+    , TriniteTex, true, true, false, 0, Material.ground).setHardness(0.2F).setBlockName("Trinitite");
 
     public static Block NukedLog = new TNM_BurntLog(getBlockIdFor("BurntLog",120)
     , NukedLogSide, NukedLogTop).setBlockName("Burnt Log");
@@ -145,7 +156,7 @@ public class mod_NukeModMain extends BaseMod {
     , IGrassSide, IGrassTop, IGrassBottom).setBlockName("Irradiated Grass");
 
     public static Block NukedPlanks = new TNM_Trinitite(getBlockIdFor("BurntPlanks",122)
-    , NukedPlanksTex, false, true, false, 0).setHardness(0.1F).setBlockName("BurntPlanks");
+    , NukedPlanksTex, false, true, false, 0, Material.wood).setHardness(0.1F).setBlockName("BurntPlanks");
     
     public static Block NukeCasing = new TNM_NukeCasing(getBlockIdFor("GunTypeWarheadHousing",123)
     , Material.leaves, NukeCasingSide, NukeCasingTop).setHardness(0.4F).setBlockName("Gun-Type Warhead Housing");
@@ -169,19 +180,19 @@ public class mod_NukeModMain extends BaseMod {
     public static Block Antenna = new TNM_Antenna(getBlockIdFor("DetonationAntenna", 129)
     , antennaside, antennatip).setStepSound(Block.soundMetalFootstep).setBlockName("Detonation Antenna");
 
-    public static Block PulverizedStone = new TNM_Trinitite(getBlockIdFor("PulverizedStone", 130), pulverizedstonetex, true, false, false, 0)
+    public static Block PulverizedStone = new TNM_Trinitite(getBlockIdFor("PulverizedStone", 130), pulverizedstonetex, true, false, false, 0, Material.ground)
     .setHardness(1F).setBlockName("Pulverized Stone");
     
-    public static Block ScorchedStone = new TNM_Trinitite(getBlockIdFor("ScorchedStone", 131), scorchedstonetex, false, false, false, 0)
+    public static Block ScorchedStone = new TNM_Trinitite(getBlockIdFor("ScorchedStone", 131), scorchedstonetex, false, false, false, 0, Material.rock)
     .setHardness(1F).setBlockName("Scorched Stone");
 
-    public static Block NukeDiamonds = new TNM_Trinitite(getBlockIdFor("NukeDiamonds", 132), nukediamondstex, false, false, true, Item.diamond.shiftedIndex)
+    public static Block NukeDiamonds = new TNM_Trinitite(getBlockIdFor("NukeDiamonds", 132), nukediamondstex, false, false, true, Item.diamond.shiftedIndex, Material.rock)
     .setHardness(1F).setBlockName("Nuke Diamonds");
 
-    public static Block NukeDirt = new TNM_Trinitite(getBlockIdFor("DriedDirt", 133), nukedirttex, false, false, false, 0)
+    public static Block NukeDirt = new TNM_Trinitite(getBlockIdFor("DriedDirt", 133), nukedirttex, false, false, false, 0, Material.ground)
     .setHardness(0.1F).setStepSound(Block.soundGravelFootstep).setBlockName("Dried Dirt");
 
-    public static Block SlagBlock = new TNM_Trinitite(getBlockIdFor("Slag", 134), slagtex, false, false, false, 0)
+    public static Block SlagBlock = new TNM_Trinitite(getBlockIdFor("Slag", 134), slagtex, false, false, false, 0, Material.iron)
     .setHardness(1F).setStepSound(Block.soundGravelFootstep).setBlockName("Slag");
 
     public static Block NuclearWaste = new TNM_NuclearWaste(getBlockIdFor("NuclearWaste", 135), wastetex, false).setHardness(0.1F).setBlockName("Nuclear Waste");
@@ -189,7 +200,8 @@ public class mod_NukeModMain extends BaseMod {
     public static Block WheatNuke = new TNM_WheatNuke(getBlockIdFor("WTDOUNuclearBomb", 136)
     , Material.leaves, wheatside, wheattop, wheatbottom).setBlockName("WTDOTU Nuclear Bomb");
 
-    public static Block Fallout = new TNM_NuclearWaste(getBlockIdFor("Fallout", 137), 0, true).setStepSound(Block.soundSandFootstep).setHardness(0.1F).setBlockName("Fallout");
+    public static Block Fallout = new TNM_NuclearWaste(getBlockIdFor("Fallout", 137), 0, true).setStepSound(Block.soundSandFootstep)
+    .setHardness(0.1F).setBlockName("Fallout");
 
     //---------------------------------------------------------------------------------Item declarations---------------------------------------------------------------------------------//
     public static Item Bazooka = new TNM_Bazooka(getItemIdFor("FamiliarWeapon",109)
@@ -271,8 +283,10 @@ public class mod_NukeModMain extends BaseMod {
 
     public static Item RecipeBook = new TNM_RecipeBookItem(getItemIdFor("RecipeBook",142)).setIconIndex(recipebooktex).setItemName("Recipe Book");
 
-    //test item
-    public static Item FalloutDebug = new TNM_FalloutBookItem(getItemIdFor("FalloutSpawner",150)).setIconIndex(10).setItemName("FalloutSpawner");
+    public static Item geigercounter = new Item(getItemIdFor("GeigerCounter",150)).setMaxStackSize(1).setIconIndex(geigertex).setItemName("Geiger Counter");
+
+    //nonstatic items
+    public Item DosimeterItem;
 
 
     //---------------------------------------------------------------------------------armor declarations---------------------------------------------------------------------------------//
@@ -312,8 +326,16 @@ public class mod_NukeModMain extends BaseMod {
     //block renderers
     public static int RenderHeatPipeid;
 
-    public mod_NukeModMain(){
 
+
+    public mod_NukeModMain(){
+        this.radiationManager = new TNM_RadiationManager();
+
+        //Harvest Level
+        MinecraftForge.setBlockHarvestLevel(NukeDiamonds, "pickaxe", 2);
+        MinecraftForge.setBlockHarvestLevel(ScorchedStone, "pickaxe", 1);
+        MinecraftForge.setBlockHarvestLevel(PulverizedStone, "pickaxe", 1);
+        
         //particle texture assignment
         Flash = ModLoader.addOverride("/gui/items.png", "/NukeTex/FlashParticle.png");
         Smoke = ModLoader.addOverride("/gui/items.png", "/NukeTex/BigSmoke.png");
@@ -322,6 +344,9 @@ public class mod_NukeModMain extends BaseMod {
 
         //custom block renderers
         RenderHeatPipeid = ModLoader.getUniqueBlockModelID(this, true);
+
+        //nonstatic items
+        DosimeterItem = new TNM_Dosimeter(getItemIdFor("Dosimeter",151), this.radiationManager).setIconIndex(dosimetertex).setItemName("Dosimeter");
 
         //block registry
         ModLoader.RegisterBlock(BlockNuke);
@@ -404,6 +429,8 @@ public class mod_NukeModMain extends BaseMod {
         ModLoader.AddName(detonator, "detonator");
         ModLoader.AddName(HeatPipeItem, "Heat Pipe");
         ModLoader.AddName(RecipeBook, "Nuclear Recipe Book");
+        ModLoader.AddName(geigercounter, "Geiger Counter");
+        ModLoader.AddName(DosimeterItem, "Dosimeter");
         
 
         //Armor Name Registry
@@ -720,6 +747,18 @@ public class mod_NukeModMain extends BaseMod {
             'P', Item.paper, 'C', Item.coal,
             'R', Item.ingotIron
         );
+        TNM_AssemblyRecipes.getInstance().addRecipe(
+            new ItemStack(geigercounter),
+            null,
+            false,
+            new String[]{
+                "RTR",
+                "IDI",
+                "III"
+            },
+            'R', Berylliumplate, 'T', Block.torchRedstoneActive,
+            'I', Item.ingotIron, 'D', Item.redstone
+        );
 
 
 
@@ -757,7 +796,146 @@ public class mod_NukeModMain extends BaseMod {
             Character.valueOf('R'),Item.redstone
         });
         
+
+        ModLoader.SetInGameHook(this, true, false);
         config.save();
+    }
+
+    public boolean OnTickInGame(Minecraft mc) {
+        EntityPlayer player = mc.thePlayer;
+
+        //fallout tint
+        if (mc.currentScreen == null && TNM_FalloutWeather.isPlayerInFallout(mc.theWorld, player)) {
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+    
+            // Switch to orthographic projection (screen space)
+            GL11.glMatrixMode(GL11.GL_PROJECTION);
+            GL11.glPushMatrix();
+            GL11.glLoadIdentity();
+            GL11.glOrtho(0, mc.displayWidth, mc.displayHeight, 0, -1, 1);
+    
+            GL11.glMatrixMode(GL11.GL_MODELVIEW);
+            GL11.glPushMatrix();
+            GL11.glLoadIdentity();
+    
+            // Faint dark‑green tint
+            GL11.glColor4f(0.1F, 0.2F, 0.1F, 0.3F);
+    
+            Tessellator t = Tessellator.instance;
+            t.startDrawingQuads();
+            t.addVertex(0, mc.displayHeight, 0);
+            t.addVertex(mc.displayWidth, mc.displayHeight, 0);
+            t.addVertex(mc.displayWidth, 0, 0);
+            t.addVertex(0, 0, 0);
+            t.draw();
+    
+            // Restore matrices
+            GL11.glPopMatrix();
+            GL11.glMatrixMode(GL11.GL_PROJECTION);
+            GL11.glPopMatrix();
+            GL11.glMatrixMode(GL11.GL_MODELVIEW);
+    
+            GL11.glDisable(GL11.GL_BLEND);
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+        }
+
+        //radiation logic
+        for (Object o : mc.theWorld.loadedEntityList) {
+            if (o instanceof EntityLiving) {
+                EntityLiving living = (EntityLiving) o;
+                double current = this.radiationManager.getRadiationLevel(living);
+
+                // Block under feet
+                int bx = (int)Math.floor(living.posX);
+                int by = (int)Math.floor(living.posY - 2);
+                int bz = (int)Math.floor(living.posZ);
+
+                int blockId = mc.theWorld.getBlockId(bx, by, bz);
+                Block block = Block.blocksList[blockId];
+                Random rand = mc.theWorld.rand;
+
+                //block radiation
+                if (mc.theWorld.getWorldTime() % 10 * rand.nextInt(5) == 0) {
+                    if (block instanceof TNM_Trinitite && ((TNM_Trinitite)block).irradiated) {
+                        if (living instanceof EntityPlayer) {
+                            EntityPlayer p = (EntityPlayer) living;
+                    
+                            ItemStack[] armor = p.inventory.armorInventory;
+                            boolean fullHazmat =
+                                armor[3] != null && armor[3].getItem() == mod_NukeModMain.HazmatHelmet &&
+                                armor[2] != null && armor[2].getItem() == mod_NukeModMain.HazmatChest &&
+                                armor[1] != null && armor[1].getItem() == mod_NukeModMain.HazmatLegs &&
+                                armor[0] != null && armor[0].getItem() == mod_NukeModMain.HazmatBoots;
+                    
+                            boolean hasGeiger = false;
+                            for (ItemStack stack : p.inventory.mainInventory) {
+                                if (stack != null && stack.getItem() == mod_NukeModMain.geigercounter) {
+                                    hasGeiger = true;
+                                    break;
+                                }
+                            }
+                    
+                            ItemStack helmet = armor[3];
+    
+                            if (fullHazmat && helmet != null) {
+                                int max = helmet.getMaxDamage();
+                                if (helmet.getItemDamage() < max - 1) {
+                                    helmet.damageItem(1, p);
+                                    if (hasGeiger) TNM_SoundHelper.playEntitySound(p, "geiger2.wav", 0.6F);
+                                } else {
+                                    helmet.setItemDamage(max - 1);
+                                    radiationManager.setRadiationLevel(p, current + 0.1);
+                                    if (hasGeiger) TNM_SoundHelper.playEntitySound(p, "geiger3.wav", 0.6F);
+                                }
+                            } else {
+                                radiationManager.setRadiationLevel(p, current + 0.1);
+                                if (hasGeiger) TNM_SoundHelper.playEntitySound(p, "geiger3.wav", 0.6F);
+                            }
+                        } else {
+                            // Non‑player entities
+                            radiationManager.setRadiationLevel(living, current + 0.1);
+                        }
+                    }
+                }
+
+                //damage / future poisoning logic
+                if (current > 100){
+                    if (mc.theWorld.getWorldTime() % 200 == 0) {
+                        //insert unique radiation sickness logic
+                    }
+                }
+
+                
+                //contamination decay
+                if (mc.theWorld.getWorldTime() % 500 == 0) {
+                    if (current > 0){
+                        this.radiationManager.setRadiationLevel(living, current - 0.1);
+                    }
+                    if (current < 0){
+                        this.radiationManager.setRadiationLevel(living, 0.0);
+                    }
+                }
+            }
+        }
+
+        if (mc.theWorld != null && mc.thePlayer != null && !hasRadiationLoaded && !(mc.currentScreen instanceof GuiIngameMenu)) {
+            this.radiationManager.loadRadiation(mc.theWorld);
+            hasRadiationLoaded = true;
+            lastWorld = mc.theWorld;
+            System.err.println("Radiation loaded for " + mc.theWorld.getWorldInfo().getWorldName());
+        }
+        
+        if (mc.currentScreen instanceof GuiIngameMenu && hasRadiationLoaded) {
+            this.radiationManager.saveRadiation(mc.theWorld);
+            hasRadiationLoaded = false;
+            System.err.println("radiation saved");
+        }
+
+        return true;
     }
 
 
@@ -813,6 +991,11 @@ public class mod_NukeModMain extends BaseMod {
         if (name.equals("Particulate")) {
             fx = new TNM_SmokeSystem(world, 1.0D, Particulate, x, y, z, vx, vy, vz, grav, R, G, B, brightness, scale, isFullbright, age, EnableScaleAging, EnableColorAging, TRed, TGreen, TBlue, TScale,DragisOn);
         }
+
+        if (name.equals("Fallout")) {
+            fx = new TNM_SmokeSystem(world, 0.5D, Particulate, x, y, z, vx, vy, vz, grav, R, G, B, brightness, scale, isFullbright, age, EnableScaleAging, EnableColorAging, TRed, TGreen, TBlue, TScale,DragisOn);
+        }
+
 
         if (fx != null ) {
             mc.effectRenderer.addEffect(fx);

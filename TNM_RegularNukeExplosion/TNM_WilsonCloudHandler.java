@@ -36,7 +36,7 @@ public class TNM_WilsonCloudHandler extends Entity{
             return;
         }
 
-        int samples2 = 16;
+        int samples2 = 24;
 
         if (Ring){
             for (int i = 0; i < samples2; i++) {
@@ -50,10 +50,10 @@ public class TNM_WilsonCloudHandler extends Entity{
                     0.0D + worldObj.rand.nextInt(1), 0.07D, 0.0D + worldObj.rand.nextInt(1), 0.005F,
                     1F, 1F, 1F,
                     1,
-                    20F,
+                    50F,
                     false,
                     15,
-                    true,
+                    false,
                     false,
                     0.3F, 0.3F, 0.3F,
                     35F,
@@ -76,7 +76,7 @@ public class TNM_WilsonCloudHandler extends Entity{
                         20F,
                         false,
                         15,
-                        true,
+                        false,
                         false,
                         0.3F, 0.3F, 0.3F,
                         35F,

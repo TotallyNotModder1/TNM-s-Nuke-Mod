@@ -36,10 +36,18 @@ public class TNM_NuclearWaste extends Block {
 		float var6 = (float)(2 * (1 + var5)) / 16.0F;
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, var6, 1.0F);
 	}
-
+	
 	public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
 		int var5 = var1.getBlockId(var2, var3 - 1, var4);
-		return var5 != 0 && Block.blocksList[var5].isOpaqueCube() ? var1.getBlockMaterial(var2, var3 - 1, var4).getIsSolid() : false;
+		if (var5 != 0) {
+			Block base = Block.blocksList[var5];
+	
+			// If the block below is opaque or solid on the top
+			if (base.isOpaqueCube() || var1.isBlockSolidOnSide(var2, var3 - 1, var4, 1) || var5 == Block.leaves.blockID) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
@@ -59,39 +67,11 @@ public class TNM_NuclearWaste extends Block {
 	@Override
 	public void randomDisplayTick(World world, int x, int y, int z, Random rand) {
 
-		float color1 = 0.62F;
-		float color2 = 0.72F;
-
-		if (Fallout){
-			color1 = 0.35F;
-			color2 = 0.35F;
+		if (world.getBlockId(x, y -1, z) == Block.leaves.blockID){
+			world.setBlock(x, y - 1, z, 0);
+			world.setBlock(x, y, z, 0);
 		}
 	
-		// Particle effect
-		double px = (double)x + rand.nextFloat();
-		double py = (double)y + rand.nextFloat();
-		double pz = (double)z + rand.nextFloat();
-
-		float vy = 0.0F + rand.nextFloat() * 0.01F;
-
-		mod_NukeModMain.spawnTNMParticle(world, "Particulate",
-			px, py + 0.1, pz,
-			0.0D, vy, 0.0D,
-			0,
-			color1, color2, color1,
-			1F,
-			2F,
-			false,
-			5,
-			false,
-			false,
-			0F,
-			0F,
-			0F,
-			1F,
-			true
-		);
-
 		// Radiation effect
 		List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(
 			null,
@@ -157,6 +137,7 @@ public class TNM_NuclearWaste extends Block {
 				if (e instanceof EntityPlayer) {
 					EntityPlayer player = (EntityPlayer)e;
 					ItemStack[] armor = player.inventory.armorInventory;
+					ItemStack[] inventory = player.inventory.mainInventory;
 	
 					boolean fullHazmat =
 					armor[3] != null && armor[3].getItem() == mod_NukeModMain.HazmatHelmet &&
@@ -167,6 +148,15 @@ public class TNM_NuclearWaste extends Block {
 	
 					ItemStack helmet = player.inventory.armorInventory[3]; // helmet slot
 					int roll = rand.nextInt(10);
+
+					
+					boolean hasGeiger = false;
+					for (ItemStack stack : inventory) {
+						if (stack != null && stack.getItem() == mod_NukeModMain.geigercounter) {
+							hasGeiger = true;
+							break;
+						}
+					}
 					
 
 					if (fullHazmat && helmet != null && helmet.getItem() == mod_NukeModMain.HazmatHelmet) {
@@ -175,16 +165,21 @@ public class TNM_NuclearWaste extends Block {
 						if (helmet.getItemDamage() < max - 5) {
 							if (roll == 1){
 								helmet.damageItem(1, player);
+
+								if (hasGeiger) TNM_SoundHelper.playEntitySound(player, "geiger2.wav", 0.6F);
 							}
 						} else {
 							helmet.setItemDamage(max - 5); // clamp durability at 1
 							player.attackEntityFrom(null, 1); // radiation leaks through
+
+							if (hasGeiger) TNM_SoundHelper.playEntitySound(player, "geiger3.wav", 0.6F);
 						}
 					} else {
 						if (roll == 1){
 							if (roll == 1){
 								player.attackEntityFrom(null, 5);
-								TNM_SoundHelper.playEntitySound(player, "geiger3.wav", 0.6F);
+								
+								if (hasGeiger) TNM_SoundHelper.playEntitySound(player, "geiger3.wav", 0.6F);
 							}
 						}
 					}
