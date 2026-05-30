@@ -68,7 +68,6 @@ public class TNM_RadiationManager {
 
             NBTTagCompound root = new NBTTagCompound();
             
-            // FIX: This now iterates over Map.Entry<String, Double> correctly
             for (Map.Entry<String, Double> entry : this.radiationLevels.entrySet()) {
                 if (entry.getKey().startsWith("player_")) {
                     root.setDouble(entry.getKey(), entry.getValue());
@@ -96,7 +95,6 @@ public class TNM_RadiationManager {
 
             this.radiationLevels.clear();
 
-            // FIX: Using your exact public method func_28110_c() to get the tags collection safely
             java.util.Collection tagsCollection = root.func_28110_c();
             
             for (Object obj : tagsCollection) {
